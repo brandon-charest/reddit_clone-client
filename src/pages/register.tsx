@@ -3,15 +3,22 @@ import { Form, Formik } from "formik";
 import React from "react";
 import InputField from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
+import { useRegisterMutation } from "../generated/graphql";
+import { toErrorMap } from "../utils/toErrorMap";
 
 interface registerProps {}
 
 const Register: React.FC<registerProps> = ({}) => {
+  const [, register] = useRegisterMutation();
   return (
     <Formik
       initialValues={{ username: "", password: "" }}
-      onSubmit={(values) => {
+      onSubmit={async (values, { setErrors }) => {
         console.log(values);
+        const res = await register(values);
+        if (res.data?.register.errors) {
+          setErrors(toErrorMap(res.data.register.errors));
+        }
       }}
     >
       {({ isSubmitting }) => (
