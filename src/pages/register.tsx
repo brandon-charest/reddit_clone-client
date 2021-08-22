@@ -1,5 +1,6 @@
 import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
+import { useRouter } from "next/dist/client/router";
 import React from "react";
 import InputField from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
@@ -10,14 +11,16 @@ interface registerProps {}
 
 const Register: React.FC<registerProps> = ({}) => {
   const [, register] = useRegisterMutation();
+  const router = useRouter();
   return (
     <Formik
       initialValues={{ username: "", password: "" }}
       onSubmit={async (values, { setErrors }) => {
-        console.log(values);
         const res = await register(values);
         if (res.data?.register.errors) {
           setErrors(toErrorMap(res.data.register.errors));
+        } else if (res.data?.register.user) {
+          router.push("/");
         }
       }}
     >
